@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="WebDemoGPT - galeri animasi web interaktif." />
+  <title>WebDemoGPT — Animation Gallery</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="#">WebDemoGPT</a>
+    <nav><a href="#gallery">Gallery</a><a href="#about">About</a></nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <div class="badge">CSS Animation Playground</div>
+      <h1>Explore <span>beautiful animations.</span></h1>
+      <p>Lihat, coba, dan salin berbagai animasi web dalam satu tempat.</p>
+      <a class="hero-btn" href="#gallery">Explore animations ↓</a>
+    </section>
+
+    <section class="toolbar" id="gallery">
+      <div class="search-wrap"><span>⌕</span><input id="search" type="search" placeholder="Cari animasi..." aria-label="Cari animasi" /></div>
+      <div class="filters" id="filters">
+        <button class="filter active" data-filter="all">All</button>
+        <button class="filter" data-filter="entrance">Entrance</button>
+        <button class="filter" data-filter="hover">Hover</button>
+        <button class="filter" data-filter="loading">Loading</button>
+        <button class="filter" data-filter="text">Text</button>
+        <button class="filter" data-filter="3d">3D</button>
+        <button class="filter" data-filter="background">Background</button>
+      </div>
+    </section>
+
+    <section class="grid" id="animationGrid">
+      <article class="card" data-category="entrance" data-name="Fade In"><div class="preview"><div class="demo fade-in">Fade</div></div><div class="card-info"><div><h2>Fade In</h2><small>Entrance</small></div><button class="copy" data-code=".fade-in { animation: fadeIn .8s ease both; }\n@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }">Copy CSS</button></div></article>
+      <article class="card" data-category="entrance" data-name="Slide Up"><div class="preview"><div class="demo slide-up">Slide</div></div><div class="card-info"><div><h2>Slide Up</h2><small>Entrance</small></div><button class="copy" data-code=".slide-up { animation: slideUp .8s ease both; }\n@keyframes slideUp { from { transform: translateY(40px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }">Copy CSS</button></div></article>
+      <article class="card" data-category="entrance" data-name="Bounce"><div class="preview"><div class="demo bounce">Bounce</div></div><div class="card-info"><div><h2>Bounce</h2><small>Entrance</small></div><button class="copy" data-code=".bounce { animation: bounce 1.2s infinite; }\n@keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-24px); } }">Copy CSS</button></div></article>
+      <article class="card" data-category="hover" data-name="Pulse"><div class="preview"><div class="demo pulse">Hover me</div></div><div class="card-info"><div><h2>Pulse</h2><small>Hover</small></div><button class="copy" data-code=".pulse:hover { animation: pulse .7s ease; }\n@keyframes pulse { 50% { transform: scale(1.12); } }">Copy CSS</button></div></article>
+      <article class="card" data-category="hover" data-name="Shake"><div class="preview"><div class="demo shake">Shake me</div></div><div class="card-info"><div><h2>Shake</h2><small>Hover</small></div><button class="copy" data-code=".shake:hover { animation: shake .45s ease; }\n@keyframes shake { 25% { transform: translateX(-7px); } 75% { transform: translateX(7px); } }">Copy CSS</button></div></article>
+      <article class="card" data-category="hover" data-name="Glow"><div class="preview"><div class="demo glow">Glow</div></div><div class="card-info"><div><h2>Glow</h2><small>Hover</small></div><button class="copy" data-code=".glow:hover { animation: glow 1s ease-in-out infinite alternate; }\n@keyframes glow { to { box-shadow: 0 0 35px #7c3aed; } }">Copy CSS</button></div></article>
+      <article class="card" data-category="loading" data-name="Spinner"><div class="preview"><div class="spinner"></div></div><div class="card-info"><div><h2>Spinner</h2><small>Loading</small></div><button class="copy" data-code=".spinner { animation: spin .8s linear infinite; }\n@keyframes spin { to { transform: rotate(360deg); } }">Copy CSS</button></div></article>
+      <article class="card" data-category="loading" data-name="Dots"><div class="preview"><div class="dots"><i></i><i></i><i></i></div></div><div class="card-info"><div><h2>Loading Dots</h2><small>Loading</small></div><button class="copy" data-code=".dots i { animation: dot 1s infinite; }\n@keyframes dot { 50% { transform: translateY(-9px); opacity: .5; } }">Copy CSS</button></div></article>
+      <article class="card" data-category="text" data-name="Typing"><div class="preview"><div class="typing">Hello World_</div></div><div class="card-info"><div><h2>Typing</h2><small>Text</small></div><button class="copy" data-code=".typing { animation: typing 2s steps(11), blink .5s step-end infinite alternate; overflow:hidden; white-space:nowrap; }">Copy CSS</button></div></article>
+      <article class="card" data-category="text" data-name="Wave Text"><div class="preview"><div class="wave-text">WAVE</div></div><div class="card-info"><div><h2>Wave Text</h2><small>Text</small></div><button class="copy" data-code=".wave-text { animation: wave 1.2s ease-in-out infinite; }\n@keyframes wave { 50% { transform: translateY(-12px); } }">Copy CSS</button></div></article>
+      <article class="card" data-category="3d" data-name="3D Card"><div class="preview perspective"><div class="demo card-3d">3D</div></div><div class="card-info"><div><h2>3D Card</h2><small>3D</small></div><button class="copy" data-code=".card-3d:hover { transform: perspective(500px) rotateX(12deg) rotateY(-15deg); }">Copy CSS</button></div></article>
+      <article class="card" data-category="background" data-name="Gradient Flow"><div class="preview gradient"><div class="demo">Gradient</div></div><div class="card-info"><div><h2>Gradient Flow</h2><small>Background</small></div><button class="copy" data-code=".gradient { background-size: 300% 300%; animation: gradient 5s ease infinite; }\n@keyframes gradient { 50% { background-position: 100% 50%; } }">Copy CSS</button></div></article>
+    </section>
+
+    <div class="empty" id="empty">Tidak ada animasi yang ditemukan.</div>
+
+    <section class="about" id="about"><h2>WebDemoGPT</h2><p>Tempat sederhana untuk bereksperimen dengan animasi HTML dan CSS. Hover kartu, lihat efeknya, lalu copy CSS yang kamu suka.</p></section>
+  </main>
+
+  <footer>Made for creative web experiments · WebDemoGPT</footer>
+  <div class="toast" id="toast">CSS berhasil disalin ✓</div>
+  <script src="script.js"></script>
+</body>
+</html>
