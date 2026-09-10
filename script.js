@@ -5,6 +5,13 @@ const empty = document.getElementById('empty');
 const toast = document.getElementById('toast');
 let activeFilter = 'all';
 
+// Setiap dari 112 preview mendapat waktu mulai yang berbeda.
+// Delay dibuat deterministik agar konsisten setiap reload.
+cards.forEach((card, index) => {
+  const delay = ((index * 0.137) % 2.8).toFixed(2);
+  card.style.setProperty('--animation-delay', `${delay}s`);
+});
+
 function filterCards(){
   const query = search.value.trim().toLowerCase();
   let visible = 0;
