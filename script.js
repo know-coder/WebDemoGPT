@@ -82,7 +82,7 @@ function makeExtraCard(name,index){
  article.className='card';
  article.dataset.category=category;
  article.dataset.name=name;
- // Intentionally identical structure to the original 112 cards.
+ // Identical card structure for every animation.
  article.innerHTML=`<div class="preview"><div class="demo ${cls}">${symbol}</div></div><div class="card-info"><div><h2>${name}</h2><small>${category}</small></div><button class="copy" data-code="">Copy CSS</button></div>`;
  article.querySelector('.copy').dataset.code=css;
  return article;
@@ -90,12 +90,34 @@ function makeExtraCard(name,index){
 
 for(let i=0;i<extraNames.length;i++) grid.appendChild(makeExtraCard(extraNames[i],i));
 
+// 100 additional animations. They reuse the exact same card/preview/copy structure,
+// but receive unique classes/keyframes and independent animation phases.
+const newAnimationNames = [
+'Cascade','Wave Collapse','Wave Expand','Cube Roll','Cube Flip','Cube Float','Prism Turn','Prism Tilt','Orbit Spin','Orbit Reverse',
+'Core Pulse','Core Burst','Ripple Pulse','Ripple Expand','Ripple Contract','Rotating Ring','Double Pulse','Triple Pulse','Soft Bounce','Heavy Bounce',
+'Gravity Drop','Gravity Return','Pendulum Swing','Side Swing','Wobble','Vibrate','Tremor','Rubber Band','Rubber Stretch','Elastic Pop',
+'Vector Shift','Diagonal Drift','Zigzag','Figure Loop','Infinity Spin','Helix Twist','Helix Rise','Spiral In','Spiral Out','Vortex Pull',
+'Vortex Push','Tornado Twist','Cyclone','Whirlwind','Orbit Wave','Orbit Bounce','Satellite Swing','Comet Loop','Meteor Fall','Meteor Rise',
+'Particle Drift','Particle Scatter','Particle Gather','Particle Orbit','Particle Spiral','Sparkle','Sparkle Burst','Glow Pulse','Glow Flicker','Glow Wave',
+'Light Sweep','Light Flash','Color Pulse','Color Shift','Color Wave','Shadow Pulse','Shadow Sweep','Shadow Lift','Shadow Drop','Depth Bounce',
+'Card Tilt','Card Rock','Card Twist','Card Hover','Flip Vertical','Flip Diagonal','Spin Zoom','Zoom Pulse','Zoom Bounce','Zoom Blur',
+'Clip Reveal','Clip Hide','Mask Expand','Mask Contract','Morph Circle','Morph Square','Morph Diamond','Morph Star','Morph Heart','Morph Hexagon',
+'Arrow Float','Arrow Shake','Arrow Spin','Chevron Bounce','Plus Spin','Minus Pulse','Menu Rotate','Close Rotate','Play Bounce','Search Glow'
+];
+
+const newCategoryCycle = ['entrance','hover','loading','3d','background'];
+for(let i=0;i<newAnimationNames.length;i++){
+ extraCategories[100+i] = newCategoryCycle[i%newCategoryCycle.length];
+ grid.appendChild(makeExtraCard(newAnimationNames[i],100+i));
+}
+
 const count=document.querySelector('.gallery-title strong');
 if(count) count.textContent=`${grid.querySelectorAll('.card').length} Animations`;
 
 const cards=document.querySelectorAll('.card');
 
-// Negative delays keep every preview animating immediately, but each has a different phase.
+// Negative delays make all previews animate immediately while giving every card
+// a different starting phase, including the 100 newly added animations.
 cards.forEach((card,index)=>{
  const delay=-(((index*.137)%3).toFixed(2));
  card.style.setProperty('--animation-delay',`${delay}s`);
