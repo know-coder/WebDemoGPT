@@ -20,7 +20,7 @@ function makeExtraCard(name, index) {
   const duration = (1.15 + (index % 6) * .16).toFixed(2);
   const motion = extraMotion(index);
   const shapeCss = shapeBase[shape] || '';
-  const css = `.${cls}{animation:${keyframe} ${duration}s ease-in-out infinite;transform-origin:center;display:grid;place-items:center;${shapeCss}}@keyframes ${keyframe}{${motion}}`;
+  const css = `.${cls}{animation:${keyframe} ${duration}s ease-in-out infinite;transform-origin:center;display:grid;place-items:center;background:linear-gradient(135deg,#7c3aed,#4f46e5);box-shadow:0 14px 35px #0008;${shapeCss}}@keyframes ${keyframe}{${motion}}`;
   const article = document.createElement('article');
   article.className = 'card';
   article.dataset.category = category;
