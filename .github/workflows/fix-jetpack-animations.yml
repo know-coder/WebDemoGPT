@@ -1,8 +1,5 @@
 name: Fix Jetpack animations
-on:
-  push:
-    paths:
-      - '.github/workflows/fix-jetpack-animations.yml'
+on: push
 permissions:
   contents: write
 jobs:
@@ -10,117 +7,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Improve Jetpack preview engine
+      - name: Apply Jetpack animation repair
+        shell: bash
         run: |
           python3 - <<'PY'
           from pathlib import Path
           p = Path('jetpack-compose.html')
           s = p.read_text()
-          marker = '/* WEBDEMOGPT_JETPACK_FIX_V2 */'
+          marker = 'WEBDEMOGPT_JETPACK_FIX_V2'
           if marker in s:
               raise SystemExit(0)
-          js = r'''<script>/* WEBDEMOGPT_JETPACK_FIX_V2 */
+          fix = r'''<script>/* WEBDEMOGPT_JETPACK_FIX_V2 */
 (function(){
-  const reduced=matchMedia('(prefers-reduced-motion: reduce)');
-  const style=document.createElement('style');
-  style.textContent=`.card{transition:transform .22s ease,box-shadow .22s ease}.card:hover{transform:translateY(-3px);box-shadow:0 14px 34px #0008}.preview{cursor:pointer}.preview.is-running .ui-btn{pointer-events:none}.preview .ui-popup,.preview .ui-dialog,.preview .ui-page,.preview .ui-sheet,.preview .ui-menu,.preview .ui-toast,.preview .ui-drawer{animation:none!important}.preview .scene{animation:none!important}.preview.reduced *{animation:none!important;transition:none!important}@media (prefers-reduced-motion:reduce){.card:hover{transform:none}}`;
-  document.head.appendChild(style);
-  const originalScene=scene, originalKeyframes=keyframes;
-  function direction(name){
-    const n=name.toLowerCase();
-    if(/left/.test(n)) return 'left'; if(/right/.test(n)) return 'right';
-    if(/up|vertical/.test(n)) return 'up'; if(/down/.test(n)) return 'down';
-    return 'right';
-  }
-  function runPreview(preview,name,index){
-    if(!preview||preview.classList.contains('is-running')) return;
-    preview.classList.add('is-running');
-    const sceneEl=preview.querySelector('.scene');
-    const target=preview.querySelector('.ui-popup,.ui-dialog,.ui-page,.ui-sheet,.ui-menu,.ui-toast,.ui-drawer,.ui-ripple,.ui-btn');
-    const n=name.toLowerCase(), d=direction(n), dur=Math.max(380,Math.min(1100,620+(index%5)*55));
-    const ease='cubic-bezier(.2,.8,.2,1)';
-    if(reduced.matches){ preview.classList.add('reduced'); preview.classList.remove('is-running'); return; }
-    const base={transform:'translate3d(0,0,0) scale(1) rotate(0deg)',opacity:1};
-    const frames=[];
-    if(/ripple/.test(n)){
-      const r=preview.querySelector('.ui-ripple'); if(r){frames.push([r,[{transform:'scale(.3)',opacity:.8},{transform:'scale(4)',opacity:0}],{duration:dur,easing:ease}]);}
-    } else if(/shake|error/.test(n)){
-      frames.push([sceneEl,[{transform:'translateX(0)'},{transform:'translateX(-9px)'},{transform:'translateX(9px)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}],{duration:dur,easing:'ease-in-out'}]);
-    } else if(/rotate/.test(n)){
-      frames.push([target||sceneEl,[{transform:'rotate(0deg) scale(.85)'},{transform:'rotate(180deg) scale(1.08)'},{transform:'rotate(360deg) scale(1)'}],{duration:dur,easing:ease}]);
-    } else if(/fade|crossfade/.test(n)){
-      frames.push([target||sceneEl,[{opacity:0},{opacity:1}],{duration:dur,easing:ease}]);
-    } else if(/zoom|scale/.test(n)){
-      frames.push([target||sceneEl,[{transform:'scale(.65)',opacity:0},{transform:'scale(1.06)',opacity:1},{transform:'scale(1)',opacity:1}],{duration:dur,easing:ease}]);
-    } else if(/slide|push|reveal|cover|page|navigation|route|screen/.test(n)){
-      const axis=(d==='up'||d==='down')?'Y':'X', sign=(d==='left'||d==='up')?-1:1;
-      frames.push([target||sceneEl,[{transform:`translate${axis}(${sign*70}px)`,opacity:0},{transform:'translate3d(0,0,0)',opacity:1}],{duration:dur,easing:ease}]);
-    } else if(/drawer/.test(n)){
-      frames.push([target||sceneEl,[{transform:'translateX(-115px)',opacity:0},{transform:'translateX(7px)',opacity:1},{transform:'translateX(0)',opacity:1}],{duration:dur,easing:ease}]);
-    } else if(/sheet/.test(n)){
-      frames.push([target||sceneEl,[{transform:'translateY(90px)',opacity:0},{transform:'translateY(-5px)',opacity:1},{transform:'translateY(0)',opacity:1}],{duration:dur,easing:ease}]);
-    } else if(/popup|dropdown|menu|tooltip/.test(n)){
-      frames.push([target||sceneEl,[{transform:'translateY(28px) scale(.82)',opacity:0},{transform:'translateY(-3px) scale(1.03)',opacity:1},{transform:'translateY(0) scale(1)',opacity:1}],{duration:dur,easing:ease}]);
-    } else if(/bounce/.test(n)){
-      frames.push([target||sceneEl,[{transform:'translateY(0) scale(1)'},{transform:'translateY(8px) scale(.92)'},{transform:'translateY(-7px) scale(1.05)'},{transform:'translateY(0) scale(1)'}],{duration:dur,easing:ease}]);
-    } else if(/press|tap|button|fab|card|select|toggle|check/.test(n)){
-      frames.push([target||sceneEl,[{transform:'scale(1)'},{transform:'scale(.88)'},{transform:'scale(1.06)'},{transform:'scale(1)'}],{duration:dur,easing:ease}]);
-    } else if(/expand/.test(n)){
-      frames.push([target||sceneEl,[{transform:'scale(.65)',opacity:0},{transform:'scale(1.05)',opacity:1},{transform:'scale(1)',opacity:1}],{duration:dur,easing:ease}]);
-    } else if(/collapse|close|dismiss|exit/.test(n)){
-      frames.push([target||sceneEl,[{transform:'scale(1)',opacity:1},{transform:'scale(.65)',opacity:0}],{duration:dur,easing:ease}]);
-    } else if(/loading|progress|refresh|shimmer|pulse|infinite|repeat/.test(n)){
-      frames.push([target||sceneEl,[{transform:'scaleX(.45)',opacity:.55},{transform:'scaleX(1)',opacity:1},{transform:'scaleX(.45)',opacity:.55}],{duration:dur,easing:ease}]);
-    } else {
-      frames.push([target||sceneEl,[{transform:'translateY(12px) scale(.9)',opacity:.25},{transform:'translateY(-5px) scale(1.05)',opacity:1},{transform:'translateY(0) scale(1)',opacity:1}],{duration:dur,easing:ease}]);
-    }
-    Promise.all(frames.map(([el,k,o])=>el.animate(k,o).finished.catch(()=>{}))).then(()=>{
-      preview.classList.remove('is-running');
-      if(target) Object.assign(target.style,base);
-    });
-  }
-  function fixedScene(name){
-    const t=sceneType(name);
-    const common=(label)=>`<div class="scene"><button class="ui-btn" type="button">${label}</button><span class="flow-arrow">→</span></div>`;
-    if(t==='popup') return common('Open Popup')+'<div class="ui-popup"><b>Popup</b><span>Open</span><span>Settings</span></div>';
-    if(t==='dialog') return common('Open Dialog')+'<div class="ui-dialog"><b>Confirm action?</b><p>Dialog appears</p><button class="ui-btn" type="button">Confirm</button></div>';
-    if(t==='page') return '<div class="scene"><div class="ui-card"><div class="ui-title"></div><div class="ui-row"></div><button class="ui-btn" type="button">Open Page</button></div><span class="flow-arrow">→</span><div class="ui-page"><div class="bar"></div><div class="ui-row"></div><div class="ui-row"></div></div></div>';
-    if(t==='sheet') return common('Open Sheet')+'<div class="ui-sheet"><b style="font-size:9px">Bottom Sheet</b><div class="ui-row"></div><button class="ui-btn" type="button">Action</button></div>';
-    if(t==='drawer') return common('☰ Open')+'<div class="ui-drawer"><b style="font-size:9px">Navigation</b><i></i><i></i><i></i></div>';
-    if(t==='menu') return common('Open Menu')+'<div class="ui-menu"><i></i><i></i><i></i></div>';
-    if(t==='toast') return common('Tap Action')+'<div class="ui-toast">✓ Action completed</div>';
-    return '<div class="scene"><button class="ui-btn" type="button">Press</button><div class="ui-ripple"></div></div>';
-  }
-  window.render=function(){
-    const q=search.value.trim().toLowerCase(); grid.innerHTML='';
-    const frag=document.createDocumentFragment(); let shown=0;
-    all.forEach((x,i)=>{
-      if(active!=='All'&&x[1]!==active)return;
-      if(q&&!x[0].toLowerCase().includes(q)&&!x[1].toLowerCase().includes(q))return;
-      shown++; const card=document.createElement('article'); card.className='card';
-      card.innerHTML='<div class="preview"><div class="stage">'+fixedScene(x[0])+'</div></div><div class="card-info"><h2>'+x[0]+'</h2><small>'+x[1]+'</small><div class="code">'+composeCode(x[0])+'</div></div>';
-      const preview=card.querySelector('.preview');
-      preview.addEventListener('click',()=>runPreview(preview,x[0],i));
-      card.querySelectorAll('.ui-btn').forEach(b=>b.addEventListener('click',e=>{e.stopPropagation();runPreview(preview,x[0],i)}));
-      frag.appendChild(card);
-    });
-    grid.appendChild(frag); empty.style.display=shown?'none':'block';
-  };
-  search.oninput=render; render();
-})();</script>'''
-  s=s.replace('</script></body></html>', js+'</body></html>', 1)
-  p.write_text(s)
+const reduced=matchMedia('(prefers-reduced-motion: reduce)');
+const css=document.createElement('style');css.textContent='.card{transition:transform .22s ease,box-shadow .22s ease}.card:hover{transform:translateY(-3px);box-shadow:0 14px 34px #0008}.preview{cursor:pointer}.preview .scene,.preview .ui-popup,.preview .ui-dialog,.preview .ui-page,.preview .ui-sheet,.preview .ui-menu,.preview .ui-toast,.preview .ui-drawer{animation:none!important}.preview.reduced *{animation:none!important;transition:none!important}';document.head.appendChild(css);
+function run(preview,name,i){if(!preview||preview.dataset.busy)return;preview.dataset.busy='1';if(reduced.matches){preview.classList.add('reduced');delete preview.dataset.busy;return}const n=name.toLowerCase(),t=preview.querySelector('.ui-popup,.ui-dialog,.ui-page,.ui-sheet,.ui-menu,.ui-toast,.ui-drawer,.ui-ripple,.ui-btn')||preview.querySelector('.scene'),d=620+(i%5)*55,e='cubic-bezier(.2,.8,.2,1)';let k;if(/ripple/.test(n))k=[{transform:'scale(.3)',opacity:.8},{transform:'scale(4)',opacity:0}];else if(/shake|error/.test(n))k=[{transform:'translateX(0)'},{transform:'translateX(-9px)'},{transform:'translateX(9px)'},{transform:'translateX(-6px)'},{transform:'translateX(6px)'},{transform:'translateX(0)'}];else if(/rotate/.test(n))k=[{transform:'rotate(0) scale(.85)'},{transform:'rotate(180deg) scale(1.08)'},{transform:'rotate(360deg) scale(1)'}];else if(/fade|crossfade/.test(n))k=[{opacity:0},{opacity:1}];else if(/zoom|scale/.test(n))k=[{transform:'scale(.65)',opacity:0},{transform:'scale(1.06)',opacity:1},{transform:'scale(1)',opacity:1}];else if(/slide|push|reveal|cover|page|navigation|route|screen/.test(n))k=[{transform:'translateX(70px)',opacity:0},{transform:'translateX(0)',opacity:1}];else if(/drawer/.test(n))k=[{transform:'translateX(-115px)',opacity:0},{transform:'translateX(7px)',opacity:1},{transform:'translateX(0)',opacity:1}];else if(/sheet/.test(n))k=[{transform:'translateY(90px)',opacity:0},{transform:'translateY(-5px)',opacity:1},{transform:'translateY(0)',opacity:1}];else if(/popup|dropdown|menu|tooltip/.test(n))k=[{transform:'translateY(28px) scale(.82)',opacity:0},{transform:'translateY(-3px) scale(1.03)',opacity:1},{transform:'translateY(0) scale(1)',opacity:1}];else if(/bounce/.test(n))k=[{transform:'translateY(0) scale(1)'},{transform:'translateY(8px) scale(.92)'},{transform:'translateY(-7px) scale(1.05)'},{transform:'translateY(0) scale(1)'}];else if(/press|tap|button|fab|card|select|toggle|check/.test(n))k=[{transform:'scale(1)'},{transform:'scale(.88)'},{transform:'scale(1.06)'},{transform:'scale(1)'}];else if(/expand/.test(n))k=[{transform:'scale(.65)',opacity:0},{transform:'scale(1.05)',opacity:1},{transform:'scale(1)',opacity:1}];else if(/collapse|close|dismiss|exit/.test(n))k=[{transform:'scale(1)',opacity:1},{transform:'scale(.65)',opacity:0}];else if(/loading|progress|refresh|shimmer|pulse|infinite|repeat/.test(n))k=[{transform:'scaleX(.45)',opacity:.55},{transform:'scaleX(1)',opacity:1},{transform:'scaleX(.45)',opacity:.55}];else k=[{transform:'translateY(12px) scale(.9)',opacity:.25},{transform:'translateY(-5px) scale(1.05)',opacity:1},{transform:'translateY(0) scale(1)',opacity:1}];t.animate(k,{duration:d,easing:e,fill:'both'}).finished.catch(()=>{}).then(()=>{delete preview.dataset.busy})}
+function fixedScene(name){const t=sceneType(name),common=l=>'<div class="scene"><button class="ui-btn" type="button">'+l+'</button><span class="flow-arrow">→</span></div>';if(t==='popup')return common('Open Popup')+'<div class="ui-popup"><b>Popup</b><span>Open</span><span>Settings</span></div>';if(t==='dialog')return common('Open Dialog')+'<div class="ui-dialog"><b>Confirm action?</b><p>Dialog appears</p><button class="ui-btn" type="button">Confirm</button></div>';if(t==='page')return '<div class="scene"><div class="ui-card"><div class="ui-title"></div><div class="ui-row"></div><button class="ui-btn" type="button">Open Page</button></div><span class="flow-arrow">→</span><div class="ui-page"><div class="bar"></div><div class="ui-row"></div><div class="ui-row"></div></div></div>';if(t==='sheet')return common('Open Sheet')+'<div class="ui-sheet"><b style="font-size:9px">Bottom Sheet</b><div class="ui-row"></div><button class="ui-btn" type="button">Action</button></div>';if(t==='drawer')return common('☰ Open')+'<div class="ui-drawer"><b style="font-size:9px">Navigation</b><i></i><i></i><i></i></div>';if(t==='menu')return common('Open Menu')+'<div class="ui-menu"><i></i><i></i><i></i></div>';if(t==='toast')return common('Tap Action')+'<div class="ui-toast">✓ Action completed</div>';return '<div class="scene"><button class="ui-btn" type="button">Press</button><div class="ui-ripple"></div></div>'}
+window.render=function(){const q=search.value.trim().toLowerCase();grid.innerHTML='';const f=document.createDocumentFragment();let shown=0;all.forEach((x,i)=>{if(active!=='All'&&x[1]!==active)return;if(q&&!x[0].toLowerCase().includes(q)&&!x[1].toLowerCase().includes(q))return;shown++;const c=document.createElement('article');c.className='card';c.innerHTML='<div class="preview"><div class="stage">'+fixedScene(x[0])+'</div></div><div class="card-info"><h2>'+x[0]+'</h2><small>'+x[1]+'</small><div class="code">'+composeCode(x[0])+'</div></div>';const p=c.querySelector('.preview');p.addEventListener('click',()=>run(p,x[0],i));c.querySelectorAll('.ui-btn').forEach(b=>b.addEventListener('click',ev=>{ev.stopPropagation();run(p,x[0],i)}));f.appendChild(c)});grid.appendChild(f);empty.style.display=shown?'none':'block'};search.oninput=render;render();})();</script>'''
+          s=s.replace('</script></body></html>', fix + '</body></html>', 1)
+          p.write_text(s)
           PY
-      - name: Commit changes
-        run: |
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git config user.name github-actions[bot]
+          git config user.email 41898282+github-actions[bot]@users.noreply.github.com
           git add jetpack-compose.html
-          git diff --cached --quiet || git commit -m 'Fix Jetpack Compose animation previews'
+          git commit -m 'Fix Jetpack Compose animation previews' || exit 0
           git push
-      - name: Remove temporary workflow
-        run: |
-          rm -f .github/workflows/fix-jetpack-animations.yml
-          git add -u .github/workflows/fix-jetpack-animations.yml
-          git commit -m 'Remove temporary animation fix workflow' || true
-          git push || true
