@@ -49,26 +49,19 @@
     const delay = (i * 173) % 2200;
     const css = `animation:pressFix${i} ${duration}ms cubic-bezier(.2,.8,.2,1) both;`;
     copy.dataset.code = `.press-fix-demo{${css}} @keyframes pressFix${i}{50%{${motions[i]}}}`;
-
-    // Automatic preview: every card gets its own duration and delay.
     button.style.animation = `pressFix${i} ${duration}ms cubic-bezier(.2,.8,.2,1) ${delay}ms infinite alternate`;
     button.addEventListener('click', () => {
       button.style.animation = 'none';
       void button.offsetWidth;
       button.style.animation = `pressFix${i} ${duration}ms cubic-bezier(.2,.8,.2,1) 0ms infinite alternate`;
     });
-
     copy.addEventListener('click', async () => {
-      try {
-        await navigator.clipboard.writeText(copy.dataset.code);
-        if (typeof window.showToast === 'function') window.showToast('CSS copied');
-      } catch (_) {}
+      try { await navigator.clipboard.writeText(copy.dataset.code); if (typeof window.showToast === 'function') window.showToast('CSS copied'); } catch (_) {}
     });
     fragment.appendChild(article);
   });
   grid.appendChild(fragment);
 
-  // Keep the existing gallery search/filter system aware of these cards.
   const search = document.getElementById('search');
   const filters = document.querySelectorAll('.filter');
   const applyVisibility = () => {
@@ -83,4 +76,10 @@
   search?.addEventListener('input', applyVisibility);
   filters.forEach(filter => filter.addEventListener('click', () => requestAnimationFrame(applyVisibility)));
   applyVisibility();
+
+  // Semantic geometry correction stylesheet is loaded here because this file is already included by index.html.
+  const shapeFix = document.createElement('link');
+  shapeFix.rel = 'stylesheet';
+  shapeFix.href = 'shape-fix.css';
+  document.head.appendChild(shapeFix);
 })();
