@@ -27,14 +27,14 @@
     'transform:translateX(8px) scale(.98)','transform:scale(1.05);box-shadow:0 0 0 12px #8b5cf633','transform:scale(1.08);box-shadow:0 0 0 16px #8b5cf622','transform:scale(1.16);opacity:.8','transform:scale(.88);opacity:.7','transform:translateY(-3px) scale(1.06)','transform:scale(.9) rotate(-3deg)','transform:scale(1.08) rotate(3deg)','transform:translateY(2px) scale(.96)','transform:translateY(-2px) scale(1.03)'
   ];
 
-  const keyframes = motions.map((m,i) => `@keyframes pressFix${i}{0%,100%{transform:translate(0) scale(1);opacity:1;filter:none;box-shadow:0 14px 35px #0008}50%{${m}}}` ).join('');
+  const keyframes = motions.map((m,i) => `@keyframes pressFix${i}{0%,100%{transform:translate(0) scale(1);opacity:1;filter:none;box-shadow:0 14px 35px #0008}50%{${m}}}`).join('');
   const style = document.createElement('style');
   style.id = 'press-animation-fix-style';
   style.textContent = keyframes + `.press-fix-demo{width:150px;min-height:52px;border:0;border-radius:14px;padding:0 18px;background:linear-gradient(135deg,#7c3aed,#4f46e5);color:#fff;font:700 14px/1 system-ui,sans-serif;cursor:pointer;box-shadow:0 14px 35px #0008;transform-origin:center;will-change:transform,filter,box-shadow;user-select:none}.press-fix-demo:focus-visible{outline:2px solid #fff;outline-offset:3px}`;
   document.head.appendChild(style);
 
   const existing = grid.querySelectorAll('.press-fix-card');
-  if (existing.length) return;
+  if (existing.length) existing.forEach(card => card.remove());
 
   const fragment = document.createDocumentFragment();
   names.forEach((name, i) => {
@@ -45,17 +45,42 @@
     article.innerHTML = `<div class="preview"><button class="press-fix-demo" type="button">${name}</button></div><div class="card-info"><div><h2>${name}</h2><small>Button Press</small></div><button class="copy" type="button">Copy CSS</button></div>`;
     const button = article.querySelector('.press-fix-demo');
     const copy = article.querySelector('.copy');
-    const css = `animation:pressFix${i} .48s cubic-bezier(.2,.8,.2,1) both;`;
+    const duration = 520 + ((i * 137) % 980);
+    const delay = (i * 173) % 2200;
+    const css = `animation:pressFix${i} ${duration}ms cubic-bezier(.2,.8,.2,1) both;`;
     copy.dataset.code = `.press-fix-demo{${css}} @keyframes pressFix${i}{50%{${motions[i]}}}`;
+
+    // Automatic preview: every card gets its own duration and delay.
+    button.style.animation = `pressFix${i} ${duration}ms cubic-bezier(.2,.8,.2,1) ${delay}ms infinite alternate`;
     button.addEventListener('click', () => {
       button.style.animation = 'none';
       void button.offsetWidth;
-      button.style.animation = `pressFix${i} .48s cubic-bezier(.2,.8,.2,1) both`;
+      button.style.animation = `pressFix${i} ${duration}ms cubic-bezier(.2,.8,.2,1) 0ms infinite alternate`;
     });
+
     copy.addEventListener('click', async () => {
-      try { await navigator.clipboard.writeText(copy.dataset.code); if (typeof window.showToast === 'function') window.showToast('CSS copied'); } catch (_) {}
+      try {
+        await navigator.clipboard.writeText(copy.dataset.code);
+        if (typeof window.showToast === 'function') window.showToast('CSS copied');
+      } catch (_) {}
     });
     fragment.appendChild(article);
   });
   grid.appendChild(fragment);
+
+  // Keep the existing gallery search/filter system aware of these cards.
+  const search = document.getElementById('search');
+  const filters = document.querySelectorAll('.filter');
+  const applyVisibility = () => {
+    const query = (search?.value || '').trim().toLowerCase();
+    const active = document.querySelector('.filter.active')?.dataset.filter || 'all';
+    grid.querySelectorAll('.press-fix-card').forEach(card => {
+      const matchesText = !query || card.dataset.name.toLowerCase().includes(query);
+      const matchesFilter = active === 'all' || card.dataset.category === active;
+      card.hidden = !(matchesText && matchesFilter);
+    });
+  };
+  search?.addEventListener('input', applyVisibility);
+  filters.forEach(filter => filter.addEventListener('click', () => requestAnimationFrame(applyVisibility)));
+  applyVisibility();
 })();
