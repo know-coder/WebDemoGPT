@@ -21,8 +21,14 @@ if(count) count.textContent=`${grid.querySelectorAll('.card').length} Animations
 const cards=[...document.querySelectorAll('.card')];
 cards.forEach((card,index)=>card.style.setProperty('--animation-delay',`-${((index*.137)%3).toFixed(2)}s`));
 
-function applyFilter(){const term=(search?.value||'').trim().toLowerCase();const active=document.querySelector('.filter.active')?.dataset.filter||'all';let visible=0;cards.forEach(card=>{const ok=(!term||card.dataset.name.toLowerCase().includes(term))&&(active==='all'||card.dataset.category===active);card.style.display=ok?'':'none';if(ok)visible++;});if(empty)empty.hidden=visible!==0;}
+function applyFilter(){const term=(search?.value||'').trim().toLowerCase();const active=document.querySelector('.filter.active')?.dataset.filter||'all';let visible=0;cards.forEach(card=>{const ok=(!term||card.dataset.name.toLowerCase().includes(term))&&(active==='all'||active===card.dataset.category);card.style.display=ok?'':'none';if(ok)visible++;});if(empty)empty.hidden=visible!==0;}
 search?.addEventListener('input',applyFilter);
 filters.forEach(f=>f.addEventListener('click',()=>{filters.forEach(x=>x.classList.remove('active'));f.classList.add('active');applyFilter();}));
 grid.addEventListener('click',async e=>{const btn=e.target.closest('.copy');if(!btn)return;try{await navigator.clipboard.writeText(btn.dataset.code||'');if(toast){toast.textContent='CSS copied';toast.classList.add('show');setTimeout(()=>toast.classList.remove('show'),1200);}}catch(err){}});
 applyFilter();
+
+// Load the 100 loading animations after the main gallery is initialized.
+const loadingScript=document.createElement('script');
+loadingScript.src='loading-animations.js';
+loadingScript.defer=false;
+document.body.appendChild(loadingScript);
